@@ -24,7 +24,18 @@ readExpr s  = case parse parseExpr "hcalc" s of
                 Right v -> return v
 
 parseExpr :: Parser Expr
-parseExpr = parseNumber
+parseExpr = parseUnary
+
+
+parseUnary :: Parser Expr
+parseUnary = parseNegated <|> parseNumber
+
+parseNegated :: Parser Expr
+parseNegated = do oneOf "-"
+                  expr <- parseNumber
+                  case expr of
+                    (Atom n) -> return . Atom $ (-n)
+                    otherwise -> fail "no negative number"
 
 parseNumber :: Parser Expr
 parseNumber = (Atom . read) <$> many1 digit
