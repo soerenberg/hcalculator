@@ -24,8 +24,19 @@ readExpr s  = case parse parseExpr "hcalc" s of
                 Right v -> return v
 
 parseExpr :: Parser Expr
-parseExpr = parseFactor
+parseExpr = parseTerm
 
+parseTerm :: Parser Expr
+parseTerm = chainl1 parseFactor parseTermOp
+
+parseTermOp :: Parser (Expr -> Expr -> Expr)
+parseTermOp =
+    do spaces
+       s <- char '+' <|> char '-'
+       spaces
+       case s of
+        '+' -> return Add
+        '-' -> return Sub
 
 parseFactor :: Parser Expr
 parseFactor = chainl1 parseUnary parseFactorOp
