@@ -33,6 +33,8 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , mtl
+    , parsec
   default-language: Haskell2010
 
 executable hcalculator-exe
@@ -45,6 +47,8 @@ executable hcalculator-exe
   build-depends:
       base >=4.7 && <5
     , hcalculator
+    , mtl
+    , parsec
   default-language: Haskell2010
 
 test-suite hcalculator-test
@@ -58,4 +62,6 @@ test-suite hcalculator-test
   build-depends:
       base >=4.7 && <5
     , hcalculator
+    , mtl
+    , parsec
   default-language: Haskell2010
