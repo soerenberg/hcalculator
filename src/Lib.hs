@@ -19,6 +19,7 @@ data Expr = Add Expr Expr
 data CalcError = Parser ParseError
                | InvalidCompute Expr Expr String
                | IncompletEval Expr
+               | DivisionByZero
                | Unknown String deriving (Show)
 
 type ThrowsError = Either CalcError
@@ -42,7 +43,9 @@ eval (Mul a b) = do x <- eval a
                     return $ x * y
 eval (Div a b) = do x <- eval a
                     y <- eval b
-                    return $ x / y
+                    case y of
+                        0.0 -> throwError DivisionByZero
+                        otherwise -> return $ x / y
 
 toStr :: ThrowsError Expr -> ThrowsError String
 toStr (Right (Atom x)) = return . show $ x
