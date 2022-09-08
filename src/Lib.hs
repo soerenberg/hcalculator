@@ -2,7 +2,7 @@ module Lib
     ( readExpr
     ) where
 
-import Text.ParserCombinators.Parsec hiding (spaces)
+import Text.ParserCombinators.Parsec
 import Control.Monad
 import Control.Monad.Except
 
@@ -24,8 +24,20 @@ readExpr s  = case parse parseExpr "hcalc" s of
                 Right v -> return v
 
 parseExpr :: Parser Expr
-parseExpr = parseUnary
+parseExpr = parseFactor
 
+
+parseFactor :: Parser Expr
+parseFactor = chainl1 parseUnary parseFactorOp
+
+parseFactorOp :: Parser (Expr -> Expr -> Expr)
+parseFactorOp =
+    do spaces
+       s <- char '*' <|> char '/'
+       spaces
+       case s of
+          '*' -> return Mul
+          '/' -> return Div
 
 parseUnary :: Parser Expr
 parseUnary = parseNegated <|> parseNumber
