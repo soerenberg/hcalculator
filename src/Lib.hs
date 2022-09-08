@@ -1,6 +1,9 @@
 module Lib
     ( readExpr
-    ) where
+    , eval
+    , evaledToStr
+    )
+    where
 
 import Text.ParserCombinators.Parsec
 import Control.Monad
@@ -14,9 +17,37 @@ data Expr = Add Expr Expr
           | Atom Float deriving (Show)
 
 data CalcError = Parser ParseError
+               | InvalidCompute Expr Expr String
+               | IncompletEval Expr
                | Unknown String deriving (Show)
 
 type ThrowsError = Either CalcError
+
+evaledToStr :: ThrowsError Float -> String
+evaledToStr x = extractRight $ catchError (show <$> x) (Right . show)
+
+extractRight :: ThrowsError a -> a
+extractRight (Right v) = v
+
+eval :: Expr -> ThrowsError Float
+eval (Atom x) = return x
+eval (Add a b) = do x <- eval a
+                    y <- eval b
+                    return $ x + y
+eval (Sub a b) = do x <- eval a
+                    y <- eval b
+                    return $ x - y
+eval (Mul a b) = do x <- eval a
+                    y <- eval b
+                    return $ x * y
+eval (Div a b) = do x <- eval a
+                    y <- eval b
+                    return $ x / y
+
+toStr :: ThrowsError Expr -> ThrowsError String
+toStr (Right (Atom x)) = return . show $ x
+toStr (Right y) = throwError $ IncompletEval y
+toStr (Left e) = Left e
 
 readExpr :: String -> ThrowsError Expr
 readExpr s  = case parse parseExpr "hcalc" s of

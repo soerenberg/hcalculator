@@ -7,5 +7,5 @@ import System.Environment (getArgs)
 main :: IO ()
 main = do
     args <- getArgs
-    let res = readExpr $ args !! 0
-    putStrLn . show $ res
+    let evaled = (readExpr $ args !! 0) >>= eval
+    putStrLn . evaledToStr $ evaled
