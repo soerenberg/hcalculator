@@ -43,11 +43,16 @@ parseUnary :: Parser Expr
 parseUnary = parseNegated <|> parseNumber
 
 parseNegated :: Parser Expr
-parseNegated = do oneOf "-"
+parseNegated = do spaces
+                  char '-'
                   expr <- parseNumber
+                  spaces
                   case expr of
                     (Atom n) -> return . Atom $ (-n)
                     otherwise -> fail "no negative number"
 
 parseNumber :: Parser Expr
-parseNumber = (Atom . read) <$> many1 digit
+parseNumber = do
+    x <- (Atom . read) <$> many1 digit
+    spaces
+    return x
