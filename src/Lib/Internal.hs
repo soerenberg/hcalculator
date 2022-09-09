@@ -9,13 +9,13 @@ data Expr = Add Expr Expr
           | Sub Expr Expr
           | Mul Expr Expr
           | Div Expr Expr
-          | Atom Float deriving (Show)
+          | Atom Float deriving (Eq, Show)
 
 data CalcError = Parser ParseError
                | InvalidCompute Expr Expr String
                | IncompletEval Expr
                | DivisionByZero
-               | Unknown String deriving (Show)
+               | Unknown String deriving (Eq, Show)
 
 type ThrowsError = Either CalcError
 
