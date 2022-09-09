@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Lib.Internal
   other-modules:
       Paths_hcalculator
   hs-source-dirs:
@@ -64,4 +65,6 @@ test-suite hcalculator-test
     , hcalculator
     , mtl
     , parsec
+    , tasty
+    , tasty-hunit
   default-language: Haskell2010
