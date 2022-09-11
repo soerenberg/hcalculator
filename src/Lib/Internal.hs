@@ -1,7 +1,22 @@
-module Lib.Internal where
+module Lib.Internal 
+    ( Expr
+    , CalcError
+    , ThrowsError
+    , evaledToStr
+    , extractRight
+    , eval
+    , toStr
+    , readExpr
+    , parseExpr
+    , parseTerm
+    , parseTermOp
+    , parseFactor
+    , parseFactorOp
+    , parseUnary
+    , parseNumber
+    ) where
 
 import Text.ParserCombinators.Parsec
-import Control.Monad
 import Control.Monad.Except
 
 
@@ -40,7 +55,7 @@ eval (Div a b) = do x <- eval a
                     y <- eval b
                     case y of
                         0.0 -> throwError DivisionByZero
-                        otherwise -> return $ x / y
+                        _ -> return $ x / y
 
 toStr :: ThrowsError Expr -> ThrowsError String
 toStr (Right (Atom x)) = return . show $ x
@@ -64,8 +79,9 @@ parseTermOp =
        s <- char '+' <|> char '-'
        spaces
        case s of
-        '+' -> return Add
-        '-' -> return Sub
+           '+' -> return Add
+           '-' -> return Sub
+           _ -> fail "Error parsing op, expected '+' or '-'."
 
 parseFactor :: Parser Expr
 parseFactor = chainl1 parseUnary parseFactorOp
@@ -76,8 +92,9 @@ parseFactorOp =
        s <- char '*' <|> char '/'
        spaces
        case s of
-          '*' -> return Mul
-          '/' -> return Div
+           '*' -> return Mul
+           '/' -> return Div
+           _ -> fail "Error parsing op, expected '*' or '/'."
 
 parseUnary :: Parser Expr
 parseUnary = parseNumber
