@@ -9,6 +9,7 @@ tests :: TestTree
 tests = testGroup "Tests"
   [ evalTests
   , parseTests
+  , endToEndTests
   ]
 
 evalTests :: TestTree
@@ -32,4 +33,14 @@ parseTests = testGroup "ParseTests"
       parse parseNumber "hcalc" "4 " @?= (Right . Atom $ 4)
   , testCase "parse '3.141'" $
       parse parseNumber "hcalc" "3.141" @?= (Right . Atom $ 3.141)
+  ]
+
+endToEndTests :: TestTree
+endToEndTests = testGroup "EndToEnd"
+  [ testCase "endToEnd '2 * 4'" $ (evaledToStr $ (readExpr "2 * 4") >>= eval)
+      @?= "8.0"
+  , testCase "endToEnd '2 + 4 * 2'" $
+      (evaledToStr $ (readExpr "2 + 4 * 2") >>= eval) @?= "10.0"
+  , testCase "endToEnd '(2 + 4) * 2'" $
+      (evaledToStr $ (readExpr "(2 + 4) * 2") >>= eval) @?= "12.0"
   ]

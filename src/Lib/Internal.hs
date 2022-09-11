@@ -11,7 +11,8 @@ module Lib.Internal
     , parseTermOp
     , parseFactor
     , parseFactorOp
-    , parseUnary
+    , parsePrimary
+    , parseParenthesized
     , parseNumber
     ) where
 
@@ -87,7 +88,7 @@ parseTermOp =
            _ -> fail "Error parsing op, expected '+' or '-'."
 
 parseFactor :: Parser Expr
-parseFactor = chainl1 parseUnary parseFactorOp
+parseFactor = chainl1 parsePrimary parseFactorOp
 
 parseFactorOp :: Parser (Expr -> Expr -> Expr)
 parseFactorOp =
@@ -99,8 +100,11 @@ parseFactorOp =
            '/' -> return Div
            _ -> fail "Error parsing op, expected '*' or '/'."
 
-parseUnary :: Parser Expr
-parseUnary = parseNumber
+parsePrimary :: Parser Expr
+parsePrimary = parseParenthesized <|> parseNumber
+
+parseParenthesized :: Parser Expr
+parseParenthesized = (char '(') >> parseExpr <* (char ')')
 
 parseNumber :: Parser Expr
 parseNumber = (Atom . read) <$> (plus <|> minus <|> float) <* spaces
