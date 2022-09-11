@@ -16,7 +16,18 @@ module Lib.Internal
     ) where
 
 import Text.ParserCombinators.Parsec
-import Control.Monad.Except
+    ( (<|>)
+    , Parser
+    , ParseError
+    , chainl1
+    , char
+    , digit
+    , many1
+    , parse
+    , option
+    , spaces
+    )
+import Control.Monad.Except (catchError, throwError)
 import Data.Either (fromRight)
 
 
