@@ -83,7 +83,9 @@ parseUnary :: Parser Expr
 parseUnary = parseNumber
 
 parseNumber :: Parser Expr
-parseNumber = (Atom . read) <$> (plus <|> minus <|> bare) <* spaces
-    where plus = char '+' >> bare
-          minus = (:) <$> char '-' <*> bare
-          bare = many1 digit
+parseNumber = (Atom . read) <$> (plus <|> minus <|> float) <* spaces
+    where plus = char '+' >> float
+          minus = (:) <$> char '-' <*> float
+          float = (++) <$> int <*> option "" decimal
+          decimal = (:) <$> char '.' <*> int
+          int = many1 digit
