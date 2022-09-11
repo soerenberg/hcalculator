@@ -3,7 +3,6 @@ module Lib.Internal
     , CalcError
     , ThrowsError
     , evaledToStr
-    , extractRight
     , eval
     , toStr
     , readExpr
@@ -18,6 +17,7 @@ module Lib.Internal
 
 import Text.ParserCombinators.Parsec
 import Control.Monad.Except
+import Data.Either (fromRight)
 
 
 data Expr = Add Expr Expr
@@ -35,10 +35,8 @@ data CalcError = Parser ParseError
 type ThrowsError = Either CalcError
 
 evaledToStr :: ThrowsError Float -> String
-evaledToStr x = extractRight $ catchError (show <$> x) (Right . show)
-
-extractRight :: ThrowsError a -> a
-extractRight (Right v) = v
+evaledToStr x = fromRight "Could not catch error." $
+                    catchError (show <$> x) (Right . show)
 
 eval :: Expr -> ThrowsError Float
 eval (Atom x) = return x

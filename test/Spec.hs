@@ -7,8 +7,7 @@ main = defaultMain tests
 
 tests :: TestTree
 tests = testGroup "Tests"
-  [ testCase "extractRight" $ (extractRight $ Right "a") @?= "a"
-  , evalTests
+  [ evalTests
   , parseTests
   ]
 
