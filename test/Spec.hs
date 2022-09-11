@@ -17,6 +17,8 @@ evalTests = testGroup "EvalTests"
   , testCase "eval 7-3" $ (eval (Sub (Atom 7) (Atom 3))) @?= (Right 4)
   , testCase "eval 3*2" $ (eval (Mul (Atom 3) (Atom 2))) @?= (Right 6)
   , testCase "eval 10/4" $ (eval (Div (Atom 10) (Atom 4))) @?= (Right 2.5)
+  , testCase "eval (3+2)*4" $ (eval $ Mul (Add (Atom 3) (Atom 2)) (Atom 4)) @?=
+                              (Right 20)
   ]
 
 parseTests :: TestTree

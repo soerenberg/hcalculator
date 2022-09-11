@@ -1,6 +1,6 @@
 module Lib.Internal 
-    ( Expr
-    , CalcError
+    ( Expr (..)
+    , CalcError (..)
     , ThrowsError
     , evaledToStr
     , eval
@@ -51,15 +51,9 @@ evaledToStr x = fromRight "Could not catch error." $
 
 eval :: Expr -> ThrowsError Float
 eval (Atom x) = return x
-eval (Add a b) = do x <- eval a
-                    y <- eval b
-                    return $ x + y
-eval (Sub a b) = do x <- eval a
-                    y <- eval b
-                    return $ x - y
-eval (Mul a b) = do x <- eval a
-                    y <- eval b
-                    return $ x * y
+eval (Add a b) = (+) <$> (eval a) <*> (eval b)
+eval (Sub a b) = (-) <$> (eval a) <*> (eval b)
+eval (Mul a b) = (*) <$> (eval a) <*> (eval b)
 eval (Div a b) = do x <- eval a
                     y <- eval b
                     case y of
