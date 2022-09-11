@@ -38,9 +38,11 @@ parseTests = testGroup "ParseTests"
 endToEndTests :: TestTree
 endToEndTests = testGroup "EndToEnd"
   [ testCase "endToEnd '2 * 4'" $ (evaledToStr $ (readExpr "2 * 4") >>= eval)
-      @?= "8.0"
+      @?= "8"
   , testCase "endToEnd '2 + 4 * 2'" $
-      (evaledToStr $ (readExpr "2 + 4 * 2") >>= eval) @?= "10.0"
+      (evaledToStr $ (readExpr "2 + 4 * 2") >>= eval) @?= "10"
   , testCase "endToEnd '(2 + 4) * 2'" $
-      (evaledToStr $ (readExpr "(2 + 4) * 2") >>= eval) @?= "12.0"
+      (evaledToStr $ (readExpr "(2 + 4) * 2") >>= eval) @?= "12"
+  , testCase "endToEnd '1.1 * 2.2'" $
+      (evaledToStr $ (readExpr "1.1 * 2.2") >>= eval) @?= "2.42"
   ]

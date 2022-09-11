@@ -48,7 +48,11 @@ type ThrowsError = Either CalcError
 
 evaledToStr :: ThrowsError Float -> String
 evaledToStr x = fromRight "Could not catch error." $
-                    catchError (show <$> x) (Right . show)
+                    catchError (niceShowFloat <$> x) (Right . show)
+
+niceShowFloat :: Float -> String
+niceShowFloat x = if x == fromInteger r then show r else show x
+    where r = round x :: Integer
 
 eval :: Expr -> ThrowsError Float
 eval (Atom x) = return x
