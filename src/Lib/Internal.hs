@@ -80,19 +80,10 @@ parseFactorOp =
           '/' -> return Div
 
 parseUnary :: Parser Expr
-parseUnary = parseNegated <|> parseNumber
-
-parseNegated :: Parser Expr
-parseNegated = do spaces
-                  char '-'
-                  expr <- parseNumber
-                  spaces
-                  case expr of
-                    (Atom n) -> return . Atom $ (-n)
-                    otherwise -> fail "no negative number"
+parseUnary = parseNumber
 
 parseNumber :: Parser Expr
-parseNumber = do
-    x <- (Atom . read) <$> many1 digit
-    spaces
-    return x
+parseNumber = (Atom . read) <$> (plus <|> minus <|> bare) <* spaces
+    where plus = char '+' >> bare
+          minus = (:) <$> char '-' <*> bare
+          bare = many1 digit

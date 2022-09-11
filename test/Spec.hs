@@ -23,6 +23,12 @@ evalTests = testGroup "EvalTests"
 parseTests :: TestTree
 parseTests = testGroup "ParseTests"
   [ testCase "parse '2'" $ parse parseNumber "hcalc" "2" @?= (Right . Atom $ 2)
-  , testCase "parse '4 '" $ 
+  , testCase "parse '-3 '" $
+      parse parseNumber "hcalc" "-3" @?= (Right . Atom $ -3)
+  , testCase "parse '+79'" $
+      parse parseNumber "hcalc" "+79" @?= (Right . Atom $ 79)
+  , testCase "parse '4 '" $
       parse parseNumber "hcalc" "4 " @?= (Right . Atom $ 4)
+  , testCase "parse '3.141'" $
+      parse parseNumber "hcalc" "3.141" @?= (Right . Atom $ 3.141)
   ]
