@@ -4,7 +4,6 @@ module Lib.Internal
     , ThrowsError
     , evaledToStr
     , eval
-    , toStr
     , readExpr
     , parseExpr
     , parseTerm
@@ -39,10 +38,7 @@ data Expr = Add Expr Expr
           | Atom Float deriving (Eq, Show)
 
 data CalcError = Parser ParseError
-               | InvalidCompute Expr Expr String
-               | IncompletEval Expr
-               | DivisionByZero
-               | Unknown String deriving (Eq, Show)
+               | DivisionByZero deriving (Eq, Show)
 
 type ThrowsError = Either CalcError
 
@@ -64,11 +60,6 @@ eval (Div a b) = do x <- eval a
                     case y of
                         0.0 -> throwError DivisionByZero
                         _ -> return $ x / y
-
-toStr :: ThrowsError Expr -> ThrowsError String
-toStr (Right (Atom x)) = return . show $ x
-toStr (Right y) = throwError $ IncompletEval y
-toStr (Left e) = Left e
 
 readExpr :: String -> ThrowsError Expr
 readExpr s  = case parse parseExpr "hcalc" s of
