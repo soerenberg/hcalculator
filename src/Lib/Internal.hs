@@ -39,7 +39,11 @@ data Expr = Add Expr Expr
           | Atom Float deriving (Eq, Show)
 
 data CalcError = Parser ParseError
-               | DivisionByZero deriving (Eq, Show)
+               | DivisionByZero deriving (Eq)
+
+instance Show CalcError where
+    show (Parser e) = "Error: " ++ (show e)
+    show DivisionByZero = "Division by zero not allowed."
 
 type ThrowsError = Either CalcError
 
