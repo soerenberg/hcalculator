@@ -22,6 +22,7 @@ import Text.ParserCombinators.Parsec
     , chainl1
     , char
     , digit
+    , eof
     , many1
     , parse
     , option
@@ -62,7 +63,7 @@ eval (Div a b) = do x <- eval a
                         _ -> return $ x / y
 
 readExpr :: String -> ThrowsError Expr
-readExpr s  = case parse parseExpr "hcalc" s of
+readExpr s  = case parse (parseExpr <* eof) "hcalc" s of
                 Left e -> throwError $ Parser e
                 Right v -> return v
 
