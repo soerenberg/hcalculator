@@ -9,12 +9,15 @@ main :: IO ()
 main =
   do args <- getArgs
      case length args of
-        0 -> runRepl
+        0 -> printIntro >> runRepl
         1 -> evalAndPrint $ args !! 0
         _ -> putStrLn "Pass 0 args for Repl, 1 arg for single evaluation."
 
 runRepl :: IO ()
 runRepl = doUntil (== "exit") (readPrompt "hcalc> ") evalAndPrint (putStrLn "")
+
+printIntro :: IO ()
+printIntro = putStrLn "--- hcalc ---\nPrint 'exit' to quit."
 
 doUntil :: Monad m => (a -> Bool) -> m a -> (a -> m b) -> m b -> m b
 doUntil p x f e =
