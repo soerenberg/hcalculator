@@ -37,14 +37,19 @@ data Expr = Add Expr Expr
           | Sub Expr Expr
           | Mul Expr Expr
           | Div Expr Expr
+          | Pow Expr Expr
           | Atom Float deriving (Eq, Show)
 
 data CalcError = Parser ParseError
-               | DivisionByZero deriving (Eq)
+               | DivisionByZero
+               | NegativeExponent
+               | NonIntegralExponent deriving (Eq)
 
 instance Show CalcError where
     show (Parser e) = "Error: " ++ (show e)
     show DivisionByZero = "Division by zero not allowed."
+    show NegativeExponent = "Exponent must be non-negative."
+    show NonIntegralExponent = "Exponent must be integral."
 
 type ThrowsError = Either CalcError
 
@@ -66,6 +71,18 @@ eval (Div a b) = do x <- eval a
                     case y of
                         0.0 -> throwError DivisionByZero
                         _ -> return $ x / y
+eval (Pow a b) = do
+    x <- eval a
+    y <- eval b
+    let r | y < 0 = throwError NegativeExponent
+          | not . isIntegral $ y = throwError NonIntegralExponent
+          | otherwise = return $ x ^ (round y :: Int)
+    r
+
+isIntegral :: Float -> Bool
+isIntegral x = x == fromInteger r
+    where r = round x :: Integer
+
 
 readExpr :: String -> ThrowsError Expr
 readExpr s  = case parse (parseExpr <* eof) "hcalc" s of
@@ -73,15 +90,14 @@ readExpr s  = case parse (parseExpr <* eof) "hcalc" s of
                 Right v -> return v
 
 parseExpr :: Parser Expr
-parseExpr = parseTerm
+parseExpr = parseTerm <* spaces
 
 parseTerm :: Parser Expr
-parseTerm = chainl1 parseFactor parseTermOp
+parseTerm = chainl1 parseFactor parseTermOp <* spaces
 
 parseTermOp :: Parser (Expr -> Expr -> Expr)
 parseTermOp =
-    do spaces
-       s <- char '+' <|> char '-'
+    do s <- char '+' <|> char '-'
        spaces
        case s of
            '+' -> return Add
@@ -89,23 +105,26 @@ parseTermOp =
            _ -> fail "Error parsing op, expected '+' or '-'."
 
 parseFactor :: Parser Expr
-parseFactor = chainl1 parsePrimary parseFactorOp
+parseFactor = chainl1 parsePower parseFactorOp <* spaces
 
 parseFactorOp :: Parser (Expr -> Expr -> Expr)
 parseFactorOp =
-    do spaces
-       s <- char '*' <|> char '/'
+    do s <- char '*' <|> char '/'
        spaces
        case s of
            '*' -> return Mul
            '/' -> return Div
            _ -> fail "Error parsing op, expected '*' or '/'."
 
+parsePower :: Parser Expr
+parsePower = chainl1 parsePrimary (char '^' >> return Pow <* spaces)
+
 parsePrimary :: Parser Expr
 parsePrimary = parseParenthesized <|> parseNumber
 
 parseParenthesized :: Parser Expr
-parseParenthesized = (char '(') >> parseExpr <* (char ')' <?> "closing \")\"")
+parseParenthesized = (char '(') >> parseExpr <*
+                     (char ')' <?> "closing \")\"") <* spaces
 
 parseNumber :: Parser Expr
 parseNumber = (Atom . read) <$> (plus <|> minus <|> float) <* spaces <?>

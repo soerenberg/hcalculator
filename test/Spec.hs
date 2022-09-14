@@ -45,4 +45,6 @@ endToEndTests = testGroup "EndToEnd"
       (evaledToStr $ (readExpr "(2 + 4) * 2") >>= eval) @?= "12"
   , testCase "endToEnd '1.1 * 2.2'" $
       (evaledToStr $ (readExpr "1.1 * 2.2") >>= eval) @?= "2.42"
+  , testCase "endToEnd '(1 + 3) * 2^3'" $
+      (evaledToStr $ (readExpr "(1 + 3) * 2^3") >>= eval) @?= "32"
   ]

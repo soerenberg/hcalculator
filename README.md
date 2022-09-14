@@ -25,7 +25,7 @@ Division by zero not allowed.
 hcalc> 34 +
 Error: "hcalc" (line 1, column 5):
 unexpected end of input
-expecting white space, "(", "+", "-" or digit
+expecting white space, "(", "+", "-" or a number
 hcalc> 1 + 1 + 3.3
 5.3
 ```
@@ -39,7 +39,8 @@ The BNF grammar of the calculator is as follows:
 ```
 expression -> term
 term -> [ term ( "+" | "-" ) ]* factor;
-factor -> [ factor ( "*" | "/" ) ]* unary;
+factor -> [ factor ( "*" | "/" ) ]* power;
+power -> [ power "^" ]* unary;
 unary -> ("-") unary | primary;
 primary -> NUMBER | "(" term ")";
 
