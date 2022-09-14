@@ -17,6 +17,7 @@ module Lib.Internal
 
 import Text.ParserCombinators.Parsec
     ( (<|>)
+    , (<?>)
     , Parser
     , ParseError
     , chainl1
@@ -104,10 +105,11 @@ parsePrimary :: Parser Expr
 parsePrimary = parseParenthesized <|> parseNumber
 
 parseParenthesized :: Parser Expr
-parseParenthesized = (char '(') >> parseExpr <* (char ')')
+parseParenthesized = (char '(') >> parseExpr <* (char ')' <?> "closing \")\"")
 
 parseNumber :: Parser Expr
-parseNumber = (Atom . read) <$> (plus <|> minus <|> float) <* spaces
+parseNumber = (Atom . read) <$> (plus <|> minus <|> float) <* spaces <?>
+    "a number"
     where plus = char '+' >> float
           minus = (:) <$> char '-' <*> float
           float = (++) <$> int <*> option "" decimal
